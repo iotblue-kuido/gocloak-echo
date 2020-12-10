@@ -207,7 +207,7 @@ func (auth *directGrantMiddleware) CheckScope(next echo.HandlerFunc) echo.Handle
 	}
 }
 
-func (auth *directGrantMiddleware) Enforcer(requestConfig EnforcerConfig) echo.MiddlewareFunc {
+func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			//responseMode := ""
