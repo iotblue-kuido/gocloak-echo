@@ -250,7 +250,7 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 			}
 			var audience string
 			if strings.Contains(requestConfig.Audience, ":") {
-				requestConfig.Audience = c.Param(strings.ReplaceAll(requestConfig.Audience, ":", ""))
+				audience = c.Param(strings.ReplaceAll(requestConfig.Audience, ":", ""))
 			} else {
 				audience = requestConfig.Audience
 			}
