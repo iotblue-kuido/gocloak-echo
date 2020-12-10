@@ -249,6 +249,10 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig EnforcerConfig) echo.M
 				requestConfig.ResponseMode = &defaultRequestMode
 			}
 
+			if strings.Contains(requestConfig.Audience, ":") {
+				requestConfig.Audience = c.Param(strings.ReplaceAll(requestConfig.Audience, ":", ""))
+			}
+
 			permissions, err := auth.gocloak.GetRequestingPartyPermissions(auth.ctx, token, auth.realm, gocloak.RequestingPartyTokenOptions{
 				Permissions:  requestConfig.Permissions,
 				Audience:     gocloak.StringP(requestConfig.Audience),
