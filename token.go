@@ -32,8 +32,12 @@ const (
 
 type EnforcerConfig struct {
 	Audience     string
-	Permissions  *[]string
+	Permissions  []*EnforcerConfigPermission
 	ResponseMode *RequestModeEnum
+}
+type EnforcerConfigPermission struct {
+	Resource string
+	Scope    string
 }
 
 // JWT is a JWT

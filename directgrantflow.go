@@ -2,6 +2,7 @@ package gocloakecho
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -213,7 +214,7 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 			//responseMode := ""
 			token := ""
 
-			if requestConfig.Permissions == nil || len(*requestConfig.Permissions) <= 0 {
+			if requestConfig.Permissions == nil || len(requestConfig.Permissions) <= 0 {
 				return auth.accessDenied(c, "Access Denied")
 			}
 
@@ -249,14 +250,25 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 				requestConfig.ResponseMode = &defaultRequestMode
 			}
 			var audience string
-			if strings.Contains(requestConfig.Audience, ":") {
+			if strings.HasPrefix(requestConfig.Audience, ":") {
 				audience = c.Param(strings.ReplaceAll(requestConfig.Audience, ":", ""))
 			} else {
 				audience = requestConfig.Audience
 			}
 
+			var strPermissions []string
+			for _, permission := range requestConfig.Permissions {
+				var resource string
+				if strings.HasPrefix(permission.Resource, ":") {
+					resource = c.Param(strings.ReplaceAll(requestConfig.Audience, ":", ""))
+				} else {
+					resource = permission.Resource
+				}
+				strPermissions = append(strPermissions, fmt.Sprintf("%s#%s", resource, permission.Scope))
+			}
+
 			permissions, err := auth.gocloak.GetRequestingPartyPermissions(auth.ctx, token, auth.realm, gocloak.RequestingPartyTokenOptions{
-				Permissions:  requestConfig.Permissions,
+				Permissions:  &strPermissions,
 				Audience:     gocloak.StringP(audience),
 				ResponseMode: gocloak.StringP(string(*requestConfig.ResponseMode)),
 			})
