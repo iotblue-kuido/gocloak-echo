@@ -260,7 +260,9 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 			for _, permission := range requestConfig.Permissions {
 				var resource string
 				if strings.HasPrefix(permission.Resource, ":") {
-					resource = c.Param(strings.ReplaceAll(requestConfig.Audience, ":", ""))
+					resource = c.Param(strings.ReplaceAll(permission.Resource, ":", ""))
+				} else if strings.HasPrefix(permission.Resource, "X-") {
+					resource = c.Request().Header.Get(permission.Resource)
 				} else {
 					resource = permission.Resource
 				}
