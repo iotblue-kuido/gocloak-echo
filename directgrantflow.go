@@ -245,7 +245,7 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 				return auth.accessDenied(c, "user_not_authenticated")
 			}
 
-			defaultRequestMode := PermissionRequestMode
+			defaultRequestMode := DecisionRequestMode
 			if requestConfig.ResponseMode == nil {
 				requestConfig.ResponseMode = &defaultRequestMode
 			}
@@ -274,8 +274,11 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 				Audience:     gocloak.StringP(audience),
 				ResponseMode: gocloak.StringP(string(*requestConfig.ResponseMode)),
 			})
+
 			if err != nil {
 				return auth.permissionDenied(c, err.Error())
+			} else if len(*permissions) != len(requestConfig.Permissions) {
+				return auth.permissionDenied(c, "not_authorized")
 			}
 			log.Println(permissions)
 
