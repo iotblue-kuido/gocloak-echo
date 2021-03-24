@@ -32,7 +32,7 @@ const (
 
 type EnforcerConfig struct {
 	Audience     string
-	Permissions  []*EnforcerConfigPermission
+	Permissions  []EnforcerConfigPermission
 	ResponseMode *RequestModeEnum
 }
 type EnforcerConfigPermission struct {

@@ -260,17 +260,17 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 			}
 
 			var strPermissions []string
-			var permissionsMap []*EnforcerConfigPermission
-			permissionsMap = make([]*EnforcerConfigPermission, len(requestConfig.Permissions))
+			var permissionsMap []EnforcerConfigPermission
+			permissionsMap = make([]EnforcerConfigPermission, len(requestConfig.Permissions))
 			copy(permissionsMap, requestConfig.Permissions)
-			for _, permission := range permissionsMap {
+			for i, permission := range permissionsMap {
 				var resource string
 				if strings.HasPrefix(permission.Resource, ":") {
 					resource = c.Param(strings.ReplaceAll(permission.Resource, ":", ""))
-					permission.Resource = c.Param(strings.ReplaceAll(permission.Resource, ":", ""))
+					permissionsMap[i].Resource = c.Param(strings.ReplaceAll(permission.Resource, ":", ""))
 				} else if strings.HasPrefix(permission.Resource, "x-") {
 					resource = c.Request().Header.Get(permission.Resource)
-					permission.Resource = c.Request().Header.Get(permission.Resource)
+					permissionsMap[i].Resource = c.Request().Header.Get(permission.Resource)
 				} else {
 					resource = permission.Resource
 				}
@@ -298,7 +298,7 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 	}
 }
 
-func validatePermissions(permissions *[]gocloak.RequestingPartyPermission, permissionsConfig []*EnforcerConfigPermission) int {
+func validatePermissions(permissions *[]gocloak.RequestingPartyPermission, permissionsConfig []EnforcerConfigPermission) int {
 	var totalCount int
 
 	for _, permission := range permissionsConfig {
@@ -309,7 +309,7 @@ func validatePermissions(permissions *[]gocloak.RequestingPartyPermission, permi
 	return totalCount
 }
 
-func containsPermission(permissions *[]gocloak.RequestingPartyPermission, x *EnforcerConfigPermission) bool {
+func containsPermission(permissions *[]gocloak.RequestingPartyPermission, x EnforcerConfigPermission) bool {
 	for _, n := range *permissions {
 		if x.Resource == *n.ResourceID {
 			return contains(*n.Scopes, x.Scope)
