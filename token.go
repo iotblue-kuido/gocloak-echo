@@ -1,7 +1,7 @@
 package gocloakecho
 
 import (
-	"github.com/Nerzal/gocloak/v7/pkg/jwx"
+	"github.com/Nerzal/gocloak/v8/pkg/jwx"
 	"github.com/dgrijalva/jwt-go"
 )
 
