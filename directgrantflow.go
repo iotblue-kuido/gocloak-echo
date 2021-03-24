@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"sort"
 	"strings"
 
 	"github.com/Nerzal/gocloak/v8"
@@ -318,8 +317,12 @@ func containsPermission(permissions *[]gocloak.RequestingPartyPermission, x Enfo
 	return false
 }
 func contains(s []string, searchterm string) bool {
-	i := sort.SearchStrings(s, searchterm)
-	return i < len(s) && s[i] == searchterm
+	for i := 0; i < len(s); i++ {
+		if searchterm == s[i] {
+			return true
+		}
+	}
+	return false
 }
 
 func (auth *directGrantMiddleware) Protect(next echo.HandlerFunc) echo.HandlerFunc {
