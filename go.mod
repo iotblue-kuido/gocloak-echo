@@ -1,4 +1,4 @@
-module bitbucket.org/iotblueSaaS/gocloak-echo/v7
+module bitbucket.org/iotblueSaaS/gocloak-echo/v8
 
 go 1.15
 
