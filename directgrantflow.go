@@ -311,7 +311,7 @@ func validatePermissions(permissions *[]gocloak.RequestingPartyPermission, permi
 
 func containsPermission(permissions *[]gocloak.RequestingPartyPermission, x EnforcerConfigPermission) bool {
 	for _, n := range *permissions {
-		if x.Resource == *n.ResourceID {
+		if x.Resource == *n.ResourceName {
 			return contains(*n.Scopes, x.Scope)
 		}
 	}
