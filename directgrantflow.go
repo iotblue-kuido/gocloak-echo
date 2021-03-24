@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sort"
 	"strings"
 
 	"github.com/Nerzal/gocloak/v8"
@@ -259,12 +260,17 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 			}
 
 			var strPermissions []string
-			for _, permission := range requestConfig.Permissions {
+			var permissionsMap []*EnforcerConfigPermission
+			permissionsMap = make([]*EnforcerConfigPermission, len(requestConfig.Permissions))
+			copy(permissionsMap, requestConfig.Permissions)
+			for _, permission := range permissionsMap {
 				var resource string
 				if strings.HasPrefix(permission.Resource, ":") {
 					resource = c.Param(strings.ReplaceAll(permission.Resource, ":", ""))
+					permission.Resource = c.Param(strings.ReplaceAll(permission.Resource, ":", ""))
 				} else if strings.HasPrefix(permission.Resource, "x-") {
 					resource = c.Request().Header.Get(permission.Resource)
+					permission.Resource = c.Request().Header.Get(permission.Resource)
 				} else {
 					resource = permission.Resource
 				}
@@ -272,45 +278,17 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 			}
 
 			permissions, err := auth.gocloak.GetRequestingPartyPermissions(auth.ctx, token, auth.realm, gocloak.RequestingPartyTokenOptions{
-				Permissions:  &strPermissions,
+				//Permissions:  &strPermissions,
 				Audience:     gocloak.StringP(audience),
 				ResponseMode: gocloak.StringP(string(*requestConfig.ResponseMode)),
 			})
 
 			if err != nil {
 				return auth.permissionDenied(c, err.Error())
-			} else if len(*permissions) != len(requestConfig.Permissions) {
+			} else if len(*permissions) <= 0 || len(permissionsMap) != validatePermissions(permissions, permissionsMap) {
 				return auth.permissionDenied(c, "not_authorized")
 			}
 			log.Println(permissions)
-
-			//var tokenClaim jwt.Claims
-			//decodedTokenClaim, err := auth.gocloak.DecodeAccessTokenCustomClaims(auth.ctx, token, auth.realm, requestConfig.Audience, tokenClaim)
-			//if err != nil {
-			//	return auth.accessDenied(c, "Bearer Token missing")
-			//}
-			//log.Println(decodedTokenClaim)
-			//
-			//requestOptions := gocloak.RequestingPartyTokenOptions{}
-			//requestOptions.Permissions = requestConfig.Permissions
-			//requestOptions.Audience = gocloak.StringP(requestConfig.Audience)
-			//
-			//grant, err := auth.gocloak.GetRequestingPartyToken(auth.ctx, token, auth.realm, requestOptions)
-			//if err != nil {
-			//	log.Println("Invalid or malformed token:" + err.Error())
-			//	return auth.accessDenied(c, "Invalid or expired Token")
-			//}
-			//
-			//if grant == nil || grant.AccessToken == "" {
-			//	log.Println("Invalid or malformed token null grant")
-			//	return auth.accessDenied(c, "Invalid or expired Token")
-			//}
-			//
-			//permissionResult := auth.handlePermissions(requestConfig.Permissions, grant, responseMode, decodedTokenClaim)
-			//
-			//if permissionResult != true {
-			//	return auth.accessDenied(c, "Invalid or expired Token")
-			//}
 
 			user, _ := auth.gocloak.GetUserInfo(auth.ctx, token, auth.realm)
 			c.Set("user", user)
@@ -318,6 +296,30 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 			return next(c)
 		}
 	}
+}
+
+func validatePermissions(permissions *[]gocloak.RequestingPartyPermission, permissionsConfig []*EnforcerConfigPermission) int {
+	var totalCount int
+
+	for _, permission := range permissionsConfig {
+		if containsPermission(permissions, permission) {
+			totalCount++
+		}
+	}
+	return totalCount
+}
+
+func containsPermission(permissions *[]gocloak.RequestingPartyPermission, x *EnforcerConfigPermission) bool {
+	for _, n := range *permissions {
+		if x.Resource == *n.ResourceID {
+			return contains(*n.Scopes, x.Scope)
+		}
+	}
+	return false
+}
+func contains(s []string, searchterm string) bool {
+	i := sort.SearchStrings(s, searchterm)
+	return i < len(s) && s[i] == searchterm
 }
 
 func (auth *directGrantMiddleware) Protect(next echo.HandlerFunc) echo.HandlerFunc {
@@ -356,47 +358,6 @@ func (auth *directGrantMiddleware) Protect(next echo.HandlerFunc) echo.HandlerFu
 		return next(c)
 	}
 }
-
-//func (auth *directGrantMiddleware) handlePermissions(requestPermissions *[]string, grant *gocloak.JWT, responseMode string, decodedClaim *jwt.Token, claims jwt.Claims) bool {
-//	var expectedPermissions []PermissionClaim
-//
-//	for _, permission := range *requestPermissions {
-//		s := strings.Split(permission, "#")
-//		p := PermissionClaim{
-//			s[0],
-//			"",
-//		}
-//		if len(s) > 1 {
-//			p.scope = s[1]
-//		}
-//		expectedPermissions = append(expectedPermissions, p)
-//	}
-//	log.Println(expectedPermissions)
-//
-//	//if responseMode == "permissions" || responseMode == "decision" {
-//	//	if claims.Authorization.Permissions == nil || len(claims.Authorization.Permissions) <= 0 {
-//	//		return false
-//	//	} else {
-//	//		for _, scope := range expectedPermissions {
-//	//			for _, permission := range claims.Authorization.Permissions {
-//	//				log.Println(permission)
-//	//				if permission.Contains(scope.Id, scope.scope) == false {
-//	//					return false
-//	//				}
-//	//			}
-//	//		}
-//	//	}
-//	//} else {
-//	//	for _, scope := range expectedPermissions {
-//	//		if scope.Id != "" && scope.scope != "" {
-//	//			if claims.HasPermission(scope.Id, scope.scope) != true {
-//	//				return false
-//	//			}
-//	//		}
-//	//	}
-//	//}
-//	return true
-//}
 
 func (auth *directGrantMiddleware) accessDenied(c echo.Context, message string) error {
 	return c.JSON(http.StatusUnauthorized, APICustomError{
