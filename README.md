@@ -15,7 +15,7 @@ Use this together with the keycloak client [gocloak](https://github.com/Nerzal/g
 * Install the package
 
 ```bash
-go get "github.com/Nerzal/gocloak/v7"
+go get "github.com/Nerzal/gocloak/v8"
 ```
 
 ```go
