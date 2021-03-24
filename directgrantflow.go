@@ -252,6 +252,8 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 			var audience string
 			if strings.HasPrefix(requestConfig.Audience, ":") {
 				audience = c.Param(strings.ReplaceAll(requestConfig.Audience, ":", ""))
+			} else if strings.HasPrefix(strings.ToLower(requestConfig.Audience), "x-") {
+				audience = c.Request().Header.Get(requestConfig.Audience)
 			} else {
 				audience = requestConfig.Audience
 			}
@@ -261,7 +263,7 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 				var resource string
 				if strings.HasPrefix(permission.Resource, ":") {
 					resource = c.Param(strings.ReplaceAll(permission.Resource, ":", ""))
-				} else if strings.HasPrefix(permission.Resource, "X-") {
+				} else if strings.HasPrefix(permission.Resource, "x-") {
 					resource = c.Request().Header.Get(permission.Resource)
 				} else {
 					resource = permission.Resource
