@@ -3,7 +3,6 @@ package gocloakecho
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -287,7 +286,6 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 			} else if len(*permissions) <= 0 || len(permissionsMap) != validatePermissions(permissions, permissionsMap) {
 				return auth.permissionDenied(c, "not_authorized")
 			}
-			log.Println(permissions)
 
 			user, _ := auth.gocloak.GetUserInfo(auth.ctx, token, auth.realm)
 			c.Set("user", user)
