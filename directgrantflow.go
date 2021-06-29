@@ -276,7 +276,7 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 			}
 
 			permissions, err := auth.gocloak.GetRequestingPartyPermissions(auth.ctx, token, auth.realm, gocloak.RequestingPartyTokenOptions{
-				//Permissions:  &strPermissions,
+				Permissions:  &strPermissions,
 				Audience:     gocloak.StringP(audience),
 				ResponseMode: gocloak.StringP(string(*requestConfig.ResponseMode)),
 			})
