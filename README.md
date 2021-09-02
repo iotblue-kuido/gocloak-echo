@@ -15,10 +15,10 @@ Use this together with the keycloak client [gocloak](https://github.com/Nerzal/g
 * Install the package
 
 ```bash
-go get "github.com/Nerzal/gocloak/v8"
+go get "github.com/Nerzal/gocloak/v9"
 ```
 
-```go
+```
 // AuthenticationHandler is used to authenticate with the api
 type AuthenticationHandler interface {
 	AuthenticateClient(Authenticate) (*gocloak.JWT, error)
@@ -27,7 +27,7 @@ type AuthenticationHandler interface {
 }
 ```
 
-```go
+```
 // AuthenticationMiddleWare is used to validate the JWT
 type AuthenticationMiddleWare interface {
 	CheckToken(next echo.HandlerFunc) echo.HandlerFunc
