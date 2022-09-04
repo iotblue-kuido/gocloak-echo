@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Nerzal/gocloak/v9"
-	"github.com/Nerzal/gocloak/v9/pkg/jwx"
-	"github.com/dgrijalva/jwt-go/v4"
+	"github.com/Nerzal/gocloak/v11"
+	"github.com/Nerzal/gocloak/v11/pkg/jwx"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
@@ -90,7 +90,7 @@ func (auth *directGrantMiddleware) CheckTokenCustomHeader(next echo.HandlerFunc)
 func (auth *directGrantMiddleware) stripBearerAndCheckToken(accessToken string, realm string) (*jwt.Token, error) {
 	accessToken = extractBearerToken(accessToken)
 
-	decodedToken, _, err := auth.gocloak.DecodeAccessToken(auth.ctx, accessToken, realm, "")
+	decodedToken, _, err := auth.gocloak.DecodeAccessToken(auth.ctx, accessToken, realm)
 	return decodedToken, err
 }
 
@@ -188,7 +188,7 @@ func (auth *directGrantMiddleware) CheckScope(next echo.HandlerFunc) echo.Handle
 
 		token = extractBearerToken(token)
 		claims := &jwx.Claims{}
-		_, err := auth.gocloak.DecodeAccessTokenCustomClaims(auth.ctx, token, auth.realm, "", claims)
+		_, err := auth.gocloak.DecodeAccessTokenCustomClaims(auth.ctx, token, auth.realm, claims)
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, gocloak.APIError{
 				Code:    403,
@@ -314,9 +314,9 @@ func containsPermission(permissions *[]gocloak.RequestingPartyPermission, x Enfo
 	}
 	return false
 }
-func contains(s []string, searchterm string) bool {
+func contains(s []string, searchTerm string) bool {
 	for i := 0; i < len(s); i++ {
-		if searchterm == s[i] {
+		if searchTerm == s[i] {
 			return true
 		}
 	}

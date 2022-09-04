@@ -3,9 +3,8 @@ package gocloakecho
 import (
 	"context"
 	"errors"
+	"github.com/Nerzal/gocloak/v11"
 	"net/http"
-
-	"github.com/Nerzal/gocloak/v9"
 )
 
 // AuthenticationHandler is used to authenticate with the api

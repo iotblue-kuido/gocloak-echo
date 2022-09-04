@@ -1,8 +1,7 @@
 package gocloakecho
 
 import (
-	"github.com/Nerzal/gocloak/v9/pkg/jwx"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/Nerzal/gocloak/v11/pkg/jwx"
 )
 
 // Authenticate holds authentication information
@@ -53,7 +52,6 @@ type JWT struct {
 }
 
 type Claims struct {
-	jwt.StandardClaims
 	Typ               string             `json:"typ,omitempty"`
 	Azp               string             `json:"azp,omitempty"`
 	AuthTime          int                `json:"auth_time,omitempty"`
@@ -129,7 +127,7 @@ func Contains(a []string, x string) bool {
 	return false
 }
 
-// APIError holds message and statusCode for api errors
+// APICustomError holds message and statusCode for api errors
 type APICustomError struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
