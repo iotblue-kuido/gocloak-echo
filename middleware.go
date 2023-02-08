@@ -11,12 +11,12 @@ const (
 
 // AuthenticationMiddleWare is used to validate the JWT
 type AuthenticationMiddleWare interface {
-	// Decodes the token and checks if it is valid
+	// DecodeAndValidateToken Decodes the token and checks if it is valid
 	DecodeAndValidateToken(next echo.HandlerFunc) echo.HandlerFunc
 
 	CheckToken(next echo.HandlerFunc) echo.HandlerFunc
 
-	// The following 2 methods need higher permissions of the client in the realm
+	// CheckTokenCustomHeader The following 2 methods need higher permissions of the client in the realm
 	CheckTokenCustomHeader(next echo.HandlerFunc) echo.HandlerFunc
 	CheckScope(next echo.HandlerFunc) echo.HandlerFunc
 	Protect(next echo.HandlerFunc) echo.HandlerFunc

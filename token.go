@@ -1,7 +1,7 @@
 package gocloakecho
 
 import (
-	"github.com/Nerzal/gocloak/v11/pkg/jwx"
+	"github.com/Nerzal/gocloak/v12/pkg/jwx"
 )
 
 // Authenticate holds authentication information
@@ -31,6 +31,8 @@ const (
 
 type EnforcerConfig struct {
 	Audience     string
+	Postfix      string
+	Prefix       string
 	Permissions  []EnforcerConfigPermission
 	ResponseMode *RequestModeEnum
 }

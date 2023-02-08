@@ -3,11 +3,11 @@ package gocloakecho
 import (
 	"context"
 	"fmt"
+	"github.com/Nerzal/gocloak/v12"
 	"net/http"
 	"strings"
 
-	"github.com/Nerzal/gocloak/v11"
-	"github.com/Nerzal/gocloak/v11/pkg/jwx"
+	"github.com/Nerzal/gocloak/v12/pkg/jwx"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
@@ -18,7 +18,7 @@ import (
 // see https://www.keycloak.org/docs/latest/securing_apps/index.html#_resource_owner_password_credentials_flow and
 // https://tools.ietf.org/html/rfc6749#section-4.3 for more information about this flow
 //noinspection GoUnusedExportedFunction
-func NewDirectGrantMiddleware(ctx context.Context, gocloak gocloak.GoCloak, realm, clientID, clientSecret, allowedScope string, customHeaderName *string) AuthenticationMiddleWare {
+func NewDirectGrantMiddleware(ctx context.Context, gocloak *gocloak.GoCloak, realm, clientID, clientSecret, allowedScope string, customHeaderName *string) AuthenticationMiddleWare {
 	return &directGrantMiddleware{
 		gocloak:          gocloak,
 		realm:            realm,
@@ -31,7 +31,7 @@ func NewDirectGrantMiddleware(ctx context.Context, gocloak gocloak.GoCloak, real
 }
 
 type directGrantMiddleware struct {
-	gocloak          gocloak.GoCloak
+	gocloak          *gocloak.GoCloak
 	realm            string
 	clientID         string
 	clientSecret     string
@@ -250,11 +250,11 @@ func (auth *directGrantMiddleware) Enforcer(requestConfig *EnforcerConfig) echo.
 			}
 			var audience string
 			if strings.HasPrefix(requestConfig.Audience, ":") {
-				audience = c.Param(strings.ReplaceAll(requestConfig.Audience, ":", ""))
+				audience = requestConfig.Prefix + c.Param(strings.ReplaceAll(requestConfig.Audience, ":", "")) + requestConfig.Postfix
 			} else if strings.HasPrefix(strings.ToLower(requestConfig.Audience), "x-") {
-				audience = c.Request().Header.Get(requestConfig.Audience)
+				audience = requestConfig.Prefix + c.Request().Header.Get(requestConfig.Audience) + requestConfig.Postfix
 			} else {
-				audience = requestConfig.Audience
+				audience = requestConfig.Prefix + requestConfig.Audience + requestConfig.Postfix
 			}
 
 			var strPermissions []string
