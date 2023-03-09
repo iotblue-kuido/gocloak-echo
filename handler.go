@@ -3,7 +3,6 @@ package gocloakecho
 import (
 	"context"
 	"errors"
-	"github.com/Nerzal/gocloak/v12"
 	"net/http"
 )
 

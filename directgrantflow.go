@@ -3,11 +3,10 @@ package gocloakecho
 import (
 	"context"
 	"fmt"
-	"github.com/Nerzal/gocloak/v12"
 	"net/http"
 	"strings"
 
-	"github.com/Nerzal/gocloak/v12/pkg/jwx"
+	"github.com/Nerzal/gocloak/v13/pkg/jwx"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )

@@ -1,9 +1,9 @@
-module bitbucket.org/iotblueSaaS/gocloak-echo/v12
+module bitbucket.org/iotblueSaaS/gocloak-echo/v13
 
 go 1.18
 
 require (
-	github.com/Nerzal/gocloak/v12 v12.0.0
+	github.com/Nerzal/gocloak/v13 v13.0.0
 	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/labstack/echo/v4 v4.10.0
 )

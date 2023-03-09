@@ -1,7 +1,7 @@
 package gocloakecho
 
 import (
-	"github.com/Nerzal/gocloak/v12/pkg/jwx"
+	"github.com/Nerzal/gocloak/v13/pkg/jwx"
 )
 
 // Authenticate holds authentication information
